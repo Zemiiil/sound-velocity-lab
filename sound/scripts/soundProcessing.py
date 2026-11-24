@@ -328,10 +328,10 @@ for g, group, color, title in [(air, airNames, AIRC, "Воздух"), (breath, b
     taus = np.array(g["taus"])[order]
     xs = pos + np.arange(len(names))
     a0, a1 = xs[0] - 0.45, xs[-1] + 0.45
-    ax.fill_between([a0, a1], g["tau"] - g["t95"], g["tau"] + g["t95"], color=color, alpha=0.13, lw=0)
+    ax.fill_between([a0, a1], g["tau"] - g["se"], g["tau"] + g["se"], color=color, alpha=0.13, lw=0)
     ax.hlines(g["tau"], a0, a1, color=color, ls="--", lw=1.8)
     ax.errorbar(xs, taus, yerr=[records[nm]["sigma"] * 4 for nm in names], fmt="o", color=color, ms=9, capsize=4)
-    ax.text((xs[0] + xs[-1]) / 2, 0.97, "%s: %.1f ± %.1f мкс (95 %%)" % (title, g["tau"], g["t95"]), transform=ax.get_xaxis_transform(),
+    ax.text((xs[0] + xs[-1]) / 2, 0.97, "%s: %.1f ± %.1f мкс" % (title, g["tau"], g["se"]), transform=ax.get_xaxis_transform(),
             ha="center", va="top", color=color, fontsize=12, fontweight="bold")
     ticks += list(xs)
     labels += names
@@ -339,8 +339,8 @@ for g, group, color, title in [(air, airNames, AIRC, "Воздух"), (breath, b
 ax.set_xticks(ticks)
 ax.set_xticklabels(labels)
 ax.set_xlim(-0.8, pos - 1.2)
-lo = min(air["tau"] - air["t95"], breath["tau"] - breath["t95"])
-hi = max(air["tau"] + air["t95"], breath["tau"] + breath["t95"])
+lo = min(air["taus"].min(), breath["taus"].min())
+hi = max(air["taus"].max(), breath["taus"].max())
 ax.set_ylim(lo - 8, hi + 10)
 ax.set_xlabel("Запись (одна точка — один хлопок)")
 ax.set_ylabel("Задержка τ, мкс")
@@ -348,9 +348,9 @@ ax.grid(axis="y")
 ax.legend(handles=[
     plt.Line2D([], [], marker="o", ls="", color="#6C7A89", ms=8, label="задержка записи, усы — погрешность выбора участка"),
     plt.Line2D([], [], ls="--", color="#6C7A89", label="среднее по серии"),
-    plt.matplotlib.patches.Patch(color="#6C7A89", alpha=0.2, label="95 % доверительный интервал среднего")],
+    plt.matplotlib.patches.Patch(color="#6C7A89", alpha=0.2, label="± СКО среднего")],
     loc="lower right", fontsize=9, framealpha=0.95)
-ax.set_title("Выдох медленнее на %.0f ± %.0f мкс (p = %.3f)" % (dTau, dTauSe, pPerm))
+ax.set_title("Выдох медленнее на %.0f ± %.0f мкс" % (dTau, dTauSe))
 fig.tight_layout()
 fig.savefig(plotsPath + "delays.png", dpi=150)
 
@@ -362,7 +362,7 @@ ax.plot(xs * 1000, tau0 + kDisp * xs, color=AIRC, lw=1.5, label="τ = τ₀ + k/
 ax.errorbar(0, tau0, yerr=tau0Se, fmt="*", color=INK, ms=14, capsize=5, label="τ₀ = %.0f ± %.0f мкс → c = %.1f ± %.1f м/с" % (tau0, tau0Se, cInf, cInfSe))
 ax.set_xlabel("1/√f_c, 10⁻³ Гц^(−1/2)   (f_c — средняя частота сигнала)")
 ax.set_ylabel("Задержка τ, мкс")
-ax.set_title("Чем ниже частота хлопка, тем медленнее звук: r = %.2f, p = %.3f" % (rDisp, pDisp))
+ax.set_title("Чем ниже частота хлопка, тем больше задержка")
 ax.grid()
 ax.legend(fontsize=10, loc="upper left")
 fig.tight_layout()
