@@ -1,0 +1,3 @@
+Relative humidity = 37 %
+Temperature = 22.8 C
+Readings near the tube: 22.6 C 35.8 %; 23.3 C 37.9 %; 22.6 C 37.9 %
